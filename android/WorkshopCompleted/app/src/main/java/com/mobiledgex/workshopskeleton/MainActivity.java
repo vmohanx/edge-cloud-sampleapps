@@ -274,8 +274,8 @@ public class MainActivity extends AppCompatActivity
         // an existing app so we don't have to create new app provisioning data for this workshop.
         appName = "MobiledgeX SDK Demo";
         devName = "MobiledgeX";
-        carrierName = "TDG";
-        appVersion = "1.0";
+        carrierName = "wifi";
+        appVersion = "2.0";
 
         //NOTICE: A real app would request permission to enable this.
         MatchingEngine.setMatchingEngineLocationAllowed(true);
@@ -289,7 +289,7 @@ public class MainActivity extends AppCompatActivity
         }
         port = matchingEngine.getPort(); // Keep same port.
         AppClient.RegisterClientRequest registerClientRequest = matchingEngine.createRegisterClientRequest(ctx,
-                devName, appName, appVersion, carrierName, null);
+                devName, appName, appVersion, carrierName, null, 0, "", "", null);
         AppClient.RegisterClientReply registerStatus = matchingEngine.registerClient (registerClientRequest, host,
                 port, 10000);
         /////////////////////////////////////////////////////////////////////////////////////
@@ -326,7 +326,7 @@ public class MainActivity extends AppCompatActivity
         ////////////////////////////////////////////////////////////////////////////////////////////
         // TODO: Copy/paste the code to find the cloudlet closest to you. Replace "= null" here.
         AppClient.FindCloudletRequest findCloudletRequest= matchingEngine.createFindCloudletRequest (ctx,
-                carrierName, location);
+                carrierName, location, 0, null);
         mClosestCloudlet = matchingEngine.findCloudlet(findCloudletRequest, host, port, 10000);
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -388,7 +388,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private boolean verifyLocation(Location loc) throws InterruptedException, IOException, ExecutionException {
-        AppClient.VerifyLocationRequest verifyLocationRequest = matchingEngine.createVerifyLocationRequest(ctx, carrierName, loc);
+        AppClient.VerifyLocationRequest verifyLocationRequest = matchingEngine.createVerifyLocationRequest(ctx, carrierName, loc, 0, null);
         if (verifyLocationRequest != null) {
             try {
                 AppClient.VerifyLocationReply verifyLocationReply = matchingEngine.verifyLocation(verifyLocationRequest, host, port, 10000);
@@ -412,7 +412,7 @@ public class MainActivity extends AppCompatActivity
             Log.e(TAG, "No items added to the position list");
             return false;
         }
-        AppClient.QosPositionRequest qosPositionRequest = matchingEngine.createQoSPositionRequest(requests, 0, null);
+        AppClient.QosPositionRequest qosPositionRequest = matchingEngine.createQoSPositionRequest(requests, 0, null, 0, null);
 
         if(qosPositionRequest != null) {
             try {
@@ -559,7 +559,7 @@ public class MainActivity extends AppCompatActivity
         }
         // Ensures that user can switch from wifi to cellular network data connection (required to verifyLocation)
         matchingEngine = new MatchingEngine(ctx);
-        matchingEngine.setNetworkSwitchingEnabled(true);  //false-> wifi (Use wifi for demo)
+        matchingEngine.setNetworkSwitchingEnabled(false);  //false-> wifi (Use wifi for demo)
     }
 
     public class RegisterClientAndFindCloudletBackgroundRequest extends AsyncTask<Object, Void, Boolean> {
