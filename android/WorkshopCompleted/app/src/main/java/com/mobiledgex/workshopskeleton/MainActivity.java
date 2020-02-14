@@ -89,10 +89,18 @@ public class MainActivity extends AppCompatActivity
     private Activity ctx;
     private String host;
     private int port;
-    private String carrierName;
-    private String appName;
-    private String devName;
-    private String appVersion;
+
+    // NOTICE: In a real app, these values would be determined by the SDK, but we are reusing
+    // an existing app so we don't have to create new app provisioning data for this workshop.
+    private String carrierName = "wifi";
+    private String appName = "MobiledgeX SDK Demo";
+    private String devName = "MobiledgeX";
+    private String appVersion = "2.0";
+    private String authToken = null;
+    private int cellId = 0;
+    private String uniqueIdType = "";
+    private String uniqueId = "";
+    private List<AppClient.Tag> tags = null;
 
     private TextView cloudletNameTv;
     private TextView appNameTv;
@@ -270,13 +278,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private boolean registerClient() throws ExecutionException, InterruptedException, io.grpc.StatusRuntimeException, DmeDnsException {
-        // NOTICE: In a real app, these values would be determined by the SDK, but we are reusing
-        // an existing app so we don't have to create new app provisioning data for this workshop.
-        appName = "MobiledgeX SDK Demo";
-        devName = "MobiledgeX";
-        carrierName = "wifi";
-        appVersion = "2.0";
-
         //NOTICE: A real app would request permission to enable this.
         MatchingEngine.setMatchingEngineLocationAllowed(true);
 
@@ -285,11 +286,11 @@ public class MainActivity extends AppCompatActivity
         host = matchingEngine.generateDmeHostAddress();
         if(host == null) {
             Log.e(TAG, "Could not generate host");
-            host = "sdkdemo.dme.mobiledgex.net";   //fallback host
+            host = "wifi.dme.mobiledgex.net";   //fallback host
         }
         port = matchingEngine.getPort(); // Keep same port.
         AppClient.RegisterClientRequest registerClientRequest = matchingEngine.createRegisterClientRequest(ctx,
-                devName, appName, appVersion, carrierName, null, 0, "", "", null);
+                devName, appName, appVersion, carrierName, authToken, cellId, uniqueIdType, uniqueId, tags);
         AppClient.RegisterClientReply registerStatus = matchingEngine.registerClient (registerClientRequest, host,
                 port, 10000);
         /////////////////////////////////////////////////////////////////////////////////////
@@ -326,7 +327,7 @@ public class MainActivity extends AppCompatActivity
         ////////////////////////////////////////////////////////////////////////////////////////////
         // TODO: Copy/paste the code to find the cloudlet closest to you. Replace "= null" here.
         AppClient.FindCloudletRequest findCloudletRequest= matchingEngine.createFindCloudletRequest (ctx,
-                carrierName, location, 0, null);
+                carrierName, location, cellId, tags);
         mClosestCloudlet = matchingEngine.findCloudlet(findCloudletRequest, host, port, 10000);
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -388,7 +389,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private boolean verifyLocation(Location loc) throws InterruptedException, IOException, ExecutionException {
-        AppClient.VerifyLocationRequest verifyLocationRequest = matchingEngine.createVerifyLocationRequest(ctx, carrierName, loc, 0, null);
+        AppClient.VerifyLocationRequest verifyLocationRequest = matchingEngine.createVerifyLocationRequest(ctx, carrierName, loc, cellId, tags);
         if (verifyLocationRequest != null) {
             try {
                 AppClient.VerifyLocationReply verifyLocationReply = matchingEngine.verifyLocation(verifyLocationRequest, host, port, 10000);
@@ -412,7 +413,7 @@ public class MainActivity extends AppCompatActivity
             Log.e(TAG, "No items added to the position list");
             return false;
         }
-        AppClient.QosPositionRequest qosPositionRequest = matchingEngine.createQoSPositionRequest(requests, 0, null, 0, null);
+        AppClient.QosPositionRequest qosPositionRequest = matchingEngine.createQoSPositionRequest(requests, 0, null, cellId, tags);
 
         if(qosPositionRequest != null) {
             try {
