@@ -12,6 +12,8 @@ jobs:
 
       - name: Check out the repo
         uses: actions/checkout@v2
+        with:
+          submodules: true
 
       - name: Push to Gitlab
         uses: docker/build-push-action@v1
