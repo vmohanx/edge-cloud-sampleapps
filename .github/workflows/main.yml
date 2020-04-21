@@ -1,0 +1,35 @@
+on:
+  release:
+    types: [published]
+
+jobs:
+
+  deploy_to_staging:
+    name: Deploy app to the MobiledgeX staging setup
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Push to Gitlab
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.MOBILEDGEX_USERNAME }}
+          password: ${{ secrets.MOBILEDGEX_PASSWORD }}
+          registry: docker-stage.mobiledgex.net
+          repository: mobiledgexgitaction/images/mobiledgexsdkdemo20
+          tag_with_ref: true
+	  dockerfile : FaceDetectionServer/Dockerfile
+
+      - name: Deploy to MobiledgeX
+        id: deploy
+        uses: mobiledgex/deploy-app-action@v1.0-rc4
+        with:
+          setup: stage
+          username: ${{ secrets.MOBILEDGEX_USERNAME }}
+          password: ${{ secrets.MOBILEDGEX_PASSWORD }}
+
+      - name: Print output
+        run: echo "Image ${{ steps.deploy.outputs.image }}, Deployments ${{ steps.deploy.outputs.deployments }}"

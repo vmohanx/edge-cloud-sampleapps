@@ -1,0 +1,11 @@
+region: EU
+app: 
+  key: 
+    name: FaceDetection
+    version: "1.0"
+    organization: MobiledgeXGitAction
+  image_path: docker-stage.mobiledgex.net/mobiledgexgitaction/images/mobiledgexsdkdemo20
+  image_type: 1
+  default_flavor: 
+    name: m4.small
+  access_ports: "tcp:8008,tcp:8011"
