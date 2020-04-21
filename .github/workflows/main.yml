@@ -21,7 +21,7 @@ jobs:
           registry: docker-stage.mobiledgex.net
           repository: mobiledgexgitaction/images/mobiledgexsdkdemo20
           tag_with_ref: true
-	  dockerfile : FaceDetectionServer/Dockerfile
+          dockerfile : FaceDetectionServer/Dockerfile
 
       - name: Deploy to MobiledgeX
         id: deploy
